@@ -7,6 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class RequestParser {
     public Request parse(BufferedReader reader) throws IOException {
@@ -20,9 +21,8 @@ public class RequestParser {
     }
 
     private void injectUriAndHttpMethod(String firstRequestLine, Request request) {
-        request.setHttpMethod(findRequestHttpMethod(firstRequestLine));
-
-        String[] firstLineParams = firstRequestLine.split(" ");
+        String[] firstLineParams = firstRequestLine.split("\\s+");
+        request.setHttpMethod(findRequestHttpMethod(firstLineParams[0]));
         String uri = firstLineParams[1];
         int indexOfQuestionMark = uri.indexOf("?");
         if (indexOfQuestionMark == -1) {
@@ -46,9 +46,9 @@ public class RequestParser {
         request.setHeaders(headers);
     }
 
-    private HttpMethod findRequestHttpMethod(String requestLine) {
+    private HttpMethod findRequestHttpMethod(String methodFromRequest) {
         for (HttpMethod httpMethod : HttpMethod.values()) {
-            if (requestLine.startsWith(httpMethod.name())) {
+            if (Objects.equals(methodFromRequest, httpMethod.name())) {
                 return httpMethod;
             }
         }
@@ -59,7 +59,9 @@ public class RequestParser {
         if (requestLine == null) {
             return false;
         }
-        String[] firstLineParams = requestLine.split(" ");
-        return firstLineParams.length == 2 || firstLineParams.length == 3;
+        String[] firstLineParams = requestLine.split("\\s+");
+
+        return findRequestHttpMethod(firstLineParams[0]) != null &&
+                (firstLineParams.length == 2 || firstLineParams.length == 3);
     }
 }
