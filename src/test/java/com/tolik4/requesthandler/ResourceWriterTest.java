@@ -38,10 +38,10 @@ public class ResourceWriterTest {
 
             ResponseWriter responseWriter = new ResponseWriter();
             responseWriter.writeSuccessResponse(fileContent, bufferedWriter);
-            String actualContent = new String(Files.readAllBytes(Path.of(TMP_FILE_PATH_200)));
-            assertEquals("HTTP/1.1 200 OK" + System.lineSeparator() + System.lineSeparator() + fileContent,
-                    actualContent);
         }
+        String actualContent = new String(Files.readAllBytes(Path.of(TMP_FILE_PATH_200)));
+        assertEquals("HTTP/1.1 200 OK" + System.lineSeparator() + System.lineSeparator() + fileContent,
+                actualContent);
     }
 
     @Test
@@ -53,10 +53,10 @@ public class ResourceWriterTest {
 
             ResponseWriter responseWriter = new ResponseWriter();
             responseWriter.writePageNotFoundResponse(bufferedWriter);
-            String actualContent = new String(Files.readAllBytes(Path.of(TMP_FILE_PATH_404)));
-            assertEquals("HTTP/1.1 404 Not Found" + System.lineSeparator() + System.lineSeparator(),
-                    actualContent);
         }
+        String actualContent = new String(Files.readAllBytes(Path.of(TMP_FILE_PATH_404)));
+        assertEquals("HTTP/1.1 404 Not Found" + System.lineSeparator() + System.lineSeparator(),
+                actualContent);
     }
 
     @Test
@@ -68,10 +68,10 @@ public class ResourceWriterTest {
 
             ResponseWriter responseWriter = new ResponseWriter();
             responseWriter.writeBadRequestResponse(bufferedWriter);
-            String actualContent = new String(Files.readAllBytes(Path.of(TMP_FILE_PATH_400)));
-            assertEquals("HTTP/1.1 400 Bad Request" + System.lineSeparator() + System.lineSeparator(),
-                    actualContent);
         }
+        String actualContent = new String(Files.readAllBytes(Path.of(TMP_FILE_PATH_400)));
+        assertEquals("HTTP/1.1 400 Bad Request" + System.lineSeparator() + System.lineSeparator(),
+                actualContent);
     }
 
 

@@ -13,7 +13,6 @@ public class ResponseWriter {
         writer.newLine();
         writer.newLine();
         writer.write(content);
-        writer.flush();
     }
 
     public void writePageNotFoundResponse(BufferedWriter writer) throws IOException {
@@ -28,6 +27,5 @@ public class ResponseWriter {
         writer.write(httpStatus);
         writer.newLine();
         writer.newLine();
-        writer.flush();
     }
 }

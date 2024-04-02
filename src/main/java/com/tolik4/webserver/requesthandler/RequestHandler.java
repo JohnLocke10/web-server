@@ -1,5 +1,7 @@
 package com.tolik4.webserver.requesthandler;
 
+import com.tolik4.webserver.exceptions.BadRequestException;
+import com.tolik4.webserver.exceptions.PageNotFoundException;
 import com.tolik4.webserver.request.HttpMethod;
 import com.tolik4.webserver.request.Request;
 
@@ -12,37 +14,27 @@ public class RequestHandler {
 
     private BufferedReader socketReader;
     private BufferedWriter socketWriter;
-    private String webAppPath;
+    private ResourceReader resourceReader;
 
-    public RequestHandler(BufferedReader socketReader, BufferedWriter socketWriter, String webAppPath) {
+    public RequestHandler(BufferedReader socketReader, BufferedWriter socketWriter, ResourceReader resourceReader) {
         this.socketReader = socketReader;
         this.socketWriter = socketWriter;
-        this.webAppPath = webAppPath;
+        this.resourceReader = resourceReader;
     }
 
     public void handle() throws IOException {
-        Request request = new RequestParser().parse(socketReader);
         ResponseWriter responseWriter = new ResponseWriter();
-        if (Objects.equals(request.getHttpMethod(), HttpMethod.GET)) {
-            handleGetRequest(request, responseWriter);
-            return;
-        }
-        responseWriter.writeBadRequestResponse(socketWriter);
-    }
-
-    private void handleGetRequest(Request request, ResponseWriter responseWriter) throws IOException {
-        if (Objects.equals(null, request.getUri())) {
+        try {
+            Request request = new RequestParser().parse(socketReader);
+            if (Objects.equals(request.getHttpMethod(), HttpMethod.GET)) {
+                String content = resourceReader.readResource(request.getUri());
+                responseWriter.writeSuccessResponse(content, socketWriter);
+            }
+        } catch (BadRequestException e) {
             responseWriter.writeBadRequestResponse(socketWriter);
-            return;
-        }
-
-        String content = new ResourceReader(webAppPath).readResource(request.getUri());
-
-        if (Objects.equals(null, content)) {
+        } catch (PageNotFoundException e) {
             responseWriter.writePageNotFoundResponse(socketWriter);
-            return;
         }
-
-        responseWriter.writeSuccessResponse(content, socketWriter);
     }
+
 }

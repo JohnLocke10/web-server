@@ -1,5 +1,6 @@
 package com.tolik4.requesthandler;
 
+import com.tolik4.webserver.exceptions.PageNotFoundException;
 import com.tolik4.webserver.requesthandler.ResourceReader;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -46,11 +47,14 @@ public class ResourceReaderTest {
     }
 
     @Test
-    @DisplayName("Check return null for non existing file")
-    public void checkReturnNullForNonExistingFile() throws IOException {
-        String actualContent =
-                new ResourceReader(TEST_WEB_APP_PATH).readResource("/ResourceReaderTestFolder/NonExistingFile.html");
-        assertNull(actualContent);
+    @DisplayName("Check throws page not found exception for non existing file")
+    public void checkThrowsPageNotFoundExceptionForNonExistingFile() throws IOException {
+        ResourceReader resourceReader = new ResourceReader(TEST_WEB_APP_PATH);
+
+        PageNotFoundException actualException = assertThrows(PageNotFoundException.class, () -> {
+            resourceReader.readResource("/ResourceReaderTestFolder/NonExistingFile.html");
+        });
+        assertEquals("Page not found!", actualException.getMessage());
     }
 
 

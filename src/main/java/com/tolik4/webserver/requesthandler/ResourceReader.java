@@ -1,5 +1,7 @@
 package com.tolik4.webserver.requesthandler;
 
+import com.tolik4.webserver.exceptions.PageNotFoundException;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -17,7 +19,7 @@ public class ResourceReader {
         if (file.exists()) {
             return new String(Files.readAllBytes(Path.of(file.getPath())));
         } else {
-            return null;
+            throw new PageNotFoundException("Page not found!");
         }
     }
 }

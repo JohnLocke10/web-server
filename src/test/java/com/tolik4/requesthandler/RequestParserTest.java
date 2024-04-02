@@ -1,5 +1,6 @@
 package com.tolik4.requesthandler;
 
+import com.tolik4.webserver.exceptions.BadRequestException;
 import com.tolik4.webserver.request.Request;
 import com.tolik4.webserver.requesthandler.RequestParser;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +37,7 @@ public class RequestParserTest {
     }
 
     @ParameterizedTest
-    @DisplayName("Check parse return null uri for non valid first request line")
+    @DisplayName("Check parse throws bad request exception for non valid first request line")
     @CsvSource({
             "/index.html HTTP/1.1",
             "GETTT /styles.css HTTP/1.1",
@@ -44,14 +45,26 @@ public class RequestParserTest {
             "GET ",
             "\"\"",
             "GET /styles.css  /styles.css /styles.css",
+            "GETTer /index.html HTTP/1.1",
+            "POSTer /styles.css HTTP/1.1",
+            "    get   /users?id=123",
+            "    post   /users?id=123",
+            "       /users?id=123",
     })
-    void checkParseReturnNullUriForNonValidFirstRequestLine(String requestLine) throws IOException {
-        Request actualRequest =
-                new RequestParser().parse(
-                        new BufferedReader(
-                                new InputStreamReader(
-                                        new ByteArrayInputStream((requestLine + System.lineSeparator() + System.lineSeparator()).getBytes()))));
-        assertNull(actualRequest.getUri());
+    void checkParseThrowsBadRequestExceptionForNonValidFirstRequestLine(String requestLine) throws IOException {
+        try (BufferedReader bufferedReader = new BufferedReader(
+                new InputStreamReader(
+                        new ByteArrayInputStream((requestLine
+                                + System.lineSeparator()
+                                + System.lineSeparator()).getBytes())));) {
+
+            RequestParser requestParser = new RequestParser();
+
+            BadRequestException actualException = assertThrows(BadRequestException.class, () -> {
+                requestParser.parse(bufferedReader);
+            });
+            assertEquals("Bad request!", actualException.getMessage());
+        }
     }
 
     @ParameterizedTest
@@ -68,24 +81,6 @@ public class RequestParserTest {
                                 new InputStreamReader(
                                         new ByteArrayInputStream((requestLine + System.lineSeparator() + System.lineSeparator()).getBytes()))));
         assertEquals(expectedHttpMethod, actualRequest.getHttpMethod().name());
-    }
-
-    @ParameterizedTest
-    @DisplayName("Check parse return null httpmethod for non valid first request line")
-    @CsvSource({
-            "GETTer /index.html HTTP/1.1",
-            "POSTer /styles.css HTTP/1.1",
-            "    get   /users?id=123",
-            "    post   /users?id=123",
-            "       /users?id=123",
-    })
-    void checkParseReturnNullHttpMethodForNonValidFirstRequestLine(String requestLine) throws IOException {
-        Request actualRequest =
-                new RequestParser().parse(
-                        new BufferedReader(
-                                new InputStreamReader(
-                                        new ByteArrayInputStream((requestLine + System.lineSeparator() + System.lineSeparator()).getBytes()))));
-        assertNull(actualRequest.getHttpMethod());
     }
 
     @Test

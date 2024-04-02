@@ -1,5 +1,6 @@
 package com.tolik4.webserver.requesthandler;
 
+import com.tolik4.webserver.exceptions.BadRequestException;
 import com.tolik4.webserver.request.HttpMethod;
 import com.tolik4.webserver.request.Request;
 
@@ -13,10 +14,11 @@ public class RequestParser {
     public Request parse(BufferedReader reader) throws IOException {
         Request request = new Request();
         String requestLine = reader.readLine();
-        if (isFirstRequestLineValid(requestLine)) {
-            injectUriAndHttpMethod(requestLine, request);
-            injectHeaders(reader, request);
+        if (!isFirstRequestLineValid(requestLine)) {
+            throw new BadRequestException("Bad request!");
         }
+        injectUriAndHttpMethod(requestLine, request);
+        injectHeaders(reader, request);
         return request;
     }
 
