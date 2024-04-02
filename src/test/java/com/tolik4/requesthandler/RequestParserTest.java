@@ -1,8 +1,9 @@
-package com.tolik4.webserver;
+package com.tolik4.requesthandler;
 
 import com.tolik4.webserver.request.Request;
 import com.tolik4.webserver.requesthandler.RequestParser;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
@@ -11,8 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RequestParserTest {
 
@@ -86,5 +86,38 @@ public class RequestParserTest {
                                 new InputStreamReader(
                                         new ByteArrayInputStream((requestLine + System.lineSeparator() + System.lineSeparator()).getBytes()))));
         assertNull(actualRequest.getHttpMethod());
+    }
+
+    @Test
+    @DisplayName("Check correctness of defining headers when they are present")
+    void checkCorrectnessOfDefiningHeadersWhenTheyArePresent() throws IOException {
+        String requestWithHeaders =
+                "GET /users?id=123 HTTP/1.1\n" +
+                        "Host: test.com\n" +
+                        "Connection: keep-alive  " + System.lineSeparator() + System.lineSeparator();
+
+        Request actualRequest =
+                new RequestParser().parse(
+                        new BufferedReader(
+                                new InputStreamReader(
+                                        new ByteArrayInputStream((requestWithHeaders).getBytes()))));
+        assertTrue(actualRequest.getHeaders().containsKey("Host"));
+        assertTrue(actualRequest.getHeaders().containsKey("Connection"));
+        assertEquals(actualRequest.getHeaders().get("Host"), "test.com");
+        assertEquals(actualRequest.getHeaders().get("Connection"), "keep-alive");
+    }
+
+    @Test
+    @DisplayName("check parse return request with empty headers when they are not present")
+    void checkParseReturnRequestWithEmptyHeadersWhenTheyAreNotPresent() throws IOException {
+        String requestWithHeaders =
+                "GET /users?id=123 HTTP/1.1\n" + System.lineSeparator() + System.lineSeparator();
+
+        Request actualRequest =
+                new RequestParser().parse(
+                        new BufferedReader(
+                                new InputStreamReader(
+                                        new ByteArrayInputStream((requestWithHeaders).getBytes()))));
+        assertTrue(actualRequest.getHeaders().isEmpty());
     }
 }

@@ -16,12 +16,12 @@ public class ResponseWriter {
         writer.flush();
     }
 
-    public void writeBadRequestResponse(BufferedWriter writer) throws IOException {
-        writeUnsuccessfulResponse(writer, STATUS_400_BAD_REQUEST);
-    }
-
     public void writePageNotFoundResponse(BufferedWriter writer) throws IOException {
         writeUnsuccessfulResponse(writer, STATUS_404_NOT_FOUND);
+    }
+
+    public void writeBadRequestResponse(BufferedWriter writer) throws IOException {
+        writeUnsuccessfulResponse(writer, STATUS_400_BAD_REQUEST);
     }
 
     private void writeUnsuccessfulResponse(BufferedWriter writer, String httpStatus) throws IOException {

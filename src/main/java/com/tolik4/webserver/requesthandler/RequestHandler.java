@@ -37,6 +37,7 @@ public class RequestHandler {
         }
 
         String content = new ResourceReader(webAppPath).readResource(request.getUri());
+
         if (Objects.equals(null, content)) {
             responseWriter.writePageNotFoundResponse(socketWriter);
             return;
